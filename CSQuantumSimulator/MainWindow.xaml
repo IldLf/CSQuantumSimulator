@@ -29,6 +29,7 @@
 			<ComboBox Height="30" ItemsSource="{Binding AvailableQubits}" SelectedItem="{Binding ControlQubit}"/>
 
 			<Button Margin="0 15 0 0" Height="35" Content="Выполнить" Command="{Binding ExecuteCommand}"/>
+			<Button Margin="0 10 0 0" Height="35" Content="Шаг" Command="{Binding StepCommand}"/>
 			<Button Margin="0 10 0 0" Height="35" Content="Измерить" Command="{Binding MeasureCommand}"/>
 			<Button Margin="0 10 0 0" Height="35" Content="Сброс" Command="{Binding ResetCommand}"/>
 

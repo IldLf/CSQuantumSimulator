@@ -28,6 +28,7 @@ public class MainViewModel : BaseViewModel
 	private readonly MeasurementService measurement = new();
 
 	private QuantumRegister? register;
+	private int currentStep;
 
 	public ObservableCollection<StateEntryModel> StateEntries { get; } = new();
 	public ObservableCollection<string> Algorithms { get; } = new();
@@ -55,6 +56,7 @@ public class MainViewModel : BaseViewModel
 	}
 
 	public ICommand ExecuteCommand { get; }
+	public ICommand StepCommand { get; }
 	public ICommand ResetCommand { get; }
 	public ICommand MeasureCommand { get; }
 
@@ -82,6 +84,7 @@ public class MainViewModel : BaseViewModel
 			AvailableQubits.Add(i);
 
 		ExecuteCommand = new RelayCommand(Execute);
+		StepCommand = new RelayCommand(Step);
 		ResetCommand = new RelayCommand(Reset);
 		MeasureCommand = new RelayCommand(Measure);
 
@@ -121,19 +124,44 @@ public class MainViewModel : BaseViewModel
 
 			register = simulation.Run(CurrentCircuit, QubitCount);
 
+			currentStep = CurrentCircuit.Gates.Count;
+
 			RenderCircuit();
 			Render();
 		}
 		catch (Exception exception)
 		{
-			StateEntries.Clear();
+			ShowError(exception.Message);
+		}
+	}
 
-			StateEntries.Add(new StateEntryModel
+	private void Step()
+	{
+		try
+		{
+			QubitCount = Math.Clamp(QubitCount, 1, 8);
+
+			if (CurrentCircuit.Gates.Count == 0)
 			{
-				Basis = "Ошибка",
-				Amplitude = exception.Message,
-				Probability = -1
-			});
+				var algorithm = AlgorithmLibrary.GetAll().First(x => x.Name == SelectedAlgorithm);
+				CurrentCircuit = algorithm.BuildCircuit();
+			}
+
+			if (register is null)
+				register = new QuantumRegister(QubitCount);
+
+			if (currentStep >= CurrentCircuit.Gates.Count)
+				return;
+
+			register.ApplyGate(CurrentCircuit.Gates[currentStep]);
+			currentStep++;
+
+			RenderCircuit();
+			Render();
+		}
+		catch (Exception exception)
+		{
+			ShowError(exception.Message);
 		}
 	}
 
@@ -163,12 +191,15 @@ public class MainViewModel : BaseViewModel
 	{
 		CircuitLines.Clear();
 
-		foreach (var gate in CurrentCircuit.Gates)
+		for (int i = 0; i < CurrentCircuit.Gates.Count; i++)
 		{
+			var gate = CurrentCircuit.Gates[i];
+			var prefix = i == currentStep ? "► " : "";
+
 			if (gate.ControlQubit.HasValue)
-				CircuitLines.Add($"{gate.Name} q{gate.ControlQubit}, q{gate.TargetQubit}");
+				CircuitLines.Add($"{prefix}{gate.Name} q{gate.ControlQubit}, q{gate.TargetQubit}");
 			else
-				CircuitLines.Add($"{gate.Name} q{gate.TargetQubit}");
+				CircuitLines.Add($"{prefix}{gate.Name} q{gate.TargetQubit}");
 		}
 	}
 
@@ -178,5 +209,18 @@ public class MainViewModel : BaseViewModel
 		CircuitLines.Clear();
 		CurrentCircuit.Clear();
 		register = null;
+		currentStep = 0;
+	}
+
+	private void ShowError(string message)
+	{
+		StateEntries.Clear();
+
+		StateEntries.Add(new StateEntryModel
+		{
+			Basis = "Ошибка",
+			Amplitude = message,
+			Probability = -1
+		});
 	}
 }
