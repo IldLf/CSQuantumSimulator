@@ -23,79 +23,80 @@ namespace CSQuantumSimulator.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-	private readonly SimulationService _simulation =
-		new();
+	private readonly SimulationService simulation = new();
 
-	private readonly VisualizationService
-		_visualization = new();
+	private readonly VisualizationService visualization = new();
 
-	public ObservableCollection<StateEntryModel>
-		StateEntries
-	{ get; } = new();
+	private readonly MeasurementService	measurement = new();
 
-	public ObservableCollection<string>
-		Algorithms
-	{ get; } = new();
+	private QuantumRegister? register;
 
-	public QuantumCircuit CurrentCircuit
-	{ get; private set; } = new();
+	public ObservableCollection<StateEntryModel> StateEntries { get; } = new();
+
+	public ObservableCollection<string> Algorithms { get; } = new();
+
+	public QuantumCircuit CurrentCircuit { get; private set; } = new();
 
 	public int QubitCount { get; set; } = 2;
 
-	private string _selectedAlgorithm =
-		"Bell State";
+	private string selectedAlgorithm =	"Состояние Белла";
 
 	public string SelectedAlgorithm
 	{
-		get => _selectedAlgorithm;
-		set
-		{
-			_selectedAlgorithm = value;
+		get => selectedAlgorithm;
+		set	{
+			selectedAlgorithm = value;
 			Notify();
 		}
 	}
 
 	public ICommand ExecuteCommand { get; }
 	public ICommand ResetCommand { get; }
+	public ICommand MeasureCommand { get; }
 
 	public MainViewModel()
 	{
-		foreach (var algorithm
-			in AlgorithmLibrary.GetAll())
+		foreach (var algorithm in AlgorithmLibrary.GetAll())
 		{
-			Algorithms.Add(
-				algorithm.Name);
+			Algorithms.Add(algorithm.Name);
 		}
 
-		ExecuteCommand =
-			new RelayCommand(Execute);
+		ExecuteCommand = new RelayCommand(Execute);
 
-		ResetCommand =
-			new RelayCommand(Reset);
+		ResetCommand = new RelayCommand(Reset);
+
+		MeasureCommand = new RelayCommand(Measure);
 	}
 
 	private void Execute()
 	{
-		var algorithm =
-			AlgorithmLibrary
-			.GetAll()
-			.First(a =>
-				a.Name ==
-				SelectedAlgorithm);
+		var algorithm =	AlgorithmLibrary.GetAll().First(a => a.Name == SelectedAlgorithm);
 
-		CurrentCircuit =
-			algorithm.BuildCircuit();
+		CurrentCircuit = algorithm.BuildCircuit();
 
-		var register =
-			_simulation.Run(
-				CurrentCircuit,
-				QubitCount);
+		register = simulation.Run(CurrentCircuit, QubitCount);
+
+		Render();
+	}
+
+	private void Measure()
+	{
+		if (register is null)
+			return;
 
 		StateEntries.Clear();
 
-		foreach (var state
-			in _visualization
-			.BuildStateEntries(register))
+		StateEntries.Add(measurement.Measure(register));
+	}
+
+	private void Render()
+	{
+		if (register is null)
+			return;
+
+		StateEntries.Clear();
+
+		foreach (var state in visualization.BuildStateEntries(register))
 		{
 			StateEntries.Add(state);
 		}
@@ -105,5 +106,6 @@ public class MainViewModel : BaseViewModel
 	{
 		StateEntries.Clear();
 		CurrentCircuit.Clear();
+		register = null;
 	}
 }

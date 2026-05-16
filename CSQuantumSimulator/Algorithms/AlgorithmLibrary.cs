@@ -12,7 +12,9 @@ public static class AlgorithmLibrary
 	{
 		return new()
 		{
-			new BellStateAlgorithm()
+			new BellStateAlgorithm(),
+			new DeutschAlgorithm(),
+			new GroverAlgorithm()
 		};
 	}
 }

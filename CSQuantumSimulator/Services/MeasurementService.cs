@@ -1,14 +1,24 @@
 ﻿//логика измерения
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSQuantumSimulator.Helpers;
+using CSQuantumSimulator.Models;
+using CSQuantumSimulator.Quantum;
 
-namespace CSQuantumSimulator.Services
+namespace CSQuantumSimulator.Services;
+
+public class MeasurementService
 {
-    class MeasurementService
-    {
-    }
+	public StateEntryModel Measure(QuantumRegister register)
+	{
+		int value = register.Measure();
+
+		return new StateEntryModel
+		{
+			Basis = BasisStateHelper.Format(value, register.QubitCount),
+
+			Amplitude = "1.000 + 0.000i",
+
+			Probability = 100
+		};
+	}
 }

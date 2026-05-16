@@ -23,9 +23,15 @@
                     Width="120"
                     Margin="10 0"
                     Command="{Binding ExecuteCommand}"/>
+			
+            <Button Content="Измерить"
+                    Width="120"
+                    Margin="10 0"
+                    Command="{Binding MeasureCommand}"/>
 
 			<Button Content="Сброс"
                     Width="120"
+                    Margin="10 0"
                     Command="{Binding ResetCommand}"/>
 
 		</StackPanel>
