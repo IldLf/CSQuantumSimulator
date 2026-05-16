@@ -9,7 +9,7 @@ namespace CSQuantumSimulator.Algorithms;
 
 public class BellStateAlgorithm : IQuantumAlgorithm
 {
-	public string Name => "Bell State";
+	public string Name => "Состояние Белла";
 
 	public QuantumCircuit BuildCircuit()
 	{
