@@ -2,15 +2,17 @@
 
 //Возвращает список.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CSQuantumSimulator.Algorithms
+namespace CSQuantumSimulator.Algorithms;
+
+public static class AlgorithmLibrary
 {
-    class AlgorithmLibrary
-    {
-    }
+	public static List<IQuantumAlgorithm> GetAll()
+	{
+		return new()
+		{
+			new BellStateAlgorithm()
+		};
+	}
 }

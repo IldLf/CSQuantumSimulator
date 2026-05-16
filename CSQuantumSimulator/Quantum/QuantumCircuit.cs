@@ -1,4 +1,6 @@
-﻿//модель схемы
+﻿//using CSQuantumSimulator.Quantum;
+
+//модель схемы
 
 //Хранит:
 
@@ -11,11 +13,27 @@
 //Execute
 //Clear
 
-using System;
+using System.Collections.Generic;
 
-public class Class1
+namespace CSQuantumSimulator.Quantum;
+
+public class QuantumCircuit
 {
-	public Class1()
+	public List<QuantumGate> Gates { get; } = new();
+
+	public void AddGate(QuantumGate gate)
 	{
+		Gates.Add(gate);
+	}
+
+	public void Clear()
+	{
+		Gates.Clear();
+	}
+
+	public void Execute(QuantumRegister register)
+	{
+		foreach (var gate in Gates)
+			register.ApplyGate(gate);
 	}
 }

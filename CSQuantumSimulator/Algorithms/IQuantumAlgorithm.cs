@@ -4,15 +4,13 @@
 //BuildCircuit()
 //Description
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSQuantumSimulator.Quantum;
 
-namespace CSQuantumSimulator.Algorithms
+namespace CSQuantumSimulator.Algorithms;
+
+public interface IQuantumAlgorithm
 {
-    interface IQuantumAlgorithm
-    {
-    }
+	string Name { get; }
+
+	QuantumCircuit BuildCircuit();
 }

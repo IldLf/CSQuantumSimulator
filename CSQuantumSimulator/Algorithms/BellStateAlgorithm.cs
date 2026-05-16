@@ -3,15 +3,21 @@
 //H(0)
 //CNOT(0, 1)
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSQuantumSimulator.Quantum;
 
-namespace CSQuantumSimulator.Algorithms
+namespace CSQuantumSimulator.Algorithms;
+
+public class BellStateAlgorithm : IQuantumAlgorithm
 {
-    class BellStateAlgorithm
-    {
-    }
+	public string Name => "Bell State";
+
+	public QuantumCircuit BuildCircuit()
+	{
+		var circuit = new QuantumCircuit();
+
+		circuit.AddGate(Gates.Hadamard(0));
+		circuit.AddGate(Gates.CNOT(0, 1));
+
+		return circuit;
+	}
 }

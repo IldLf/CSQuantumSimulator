@@ -7,9 +7,27 @@
 
 using System;
 
-public class Class1
+namespace CSQuantumSimulator.Quantum;
+
+public class QuantumGate
 {
-	public Class1()
+	public string Name { get; }
+
+	public ComplexMatrix Matrix { get; }
+
+	public int TargetQubit { get; }
+
+	public int? ControlQubit { get; }
+
+	public QuantumGate(
+		string name,
+		ComplexMatrix matrix,
+		int targetQubit,
+		int? controlQubit = null)
 	{
+		Name = name;
+		Matrix = matrix;
+		TargetQubit = targetQubit;
+		ControlQubit = controlQubit;
 	}
 }

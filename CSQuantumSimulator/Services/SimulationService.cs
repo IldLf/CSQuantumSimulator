@@ -4,15 +4,21 @@
 
 //Circuit → Register evolution
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSQuantumSimulator.Quantum;
 
-namespace CSQuantumSimulator.Services
+namespace CSQuantumSimulator.Services;
+
+public class SimulationService
 {
-    class SimulationService
-    {
-    }
+	public QuantumRegister Run(
+		QuantumCircuit circuit,
+		int qubits)
+	{
+		var register =
+			new QuantumRegister(qubits);
+
+		circuit.Execute(register);
+
+		return register;
+	}
 }
