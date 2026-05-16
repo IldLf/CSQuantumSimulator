@@ -2,37 +2,54 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="CSQuantumSimulator"
-        Height="760"
-        Width="1400">
+        Height="850"
+        Width="1600">
 
 	<Grid Margin="20">
 
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="280"/>
+			<ColumnDefinition Width="320"/>
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
 
 		<StackPanel>
 
-			<ComboBox Height="30"
-			          ItemsSource="{Binding Algorithms}"
-			          SelectedItem="{Binding SelectedAlgorithm}"/>
+			<TextBlock FontSize="20" FontWeight="Bold" Text="CSQuantumSimulator"/>
 
-			<Button Content="Выполнить" Margin="0 10" Command="{Binding ExecuteCommand}"/>
-			<Button Content="Измерить" Margin="0 10" Command="{Binding MeasureCommand}"/>
-			<Button Content="Сброс" Margin="0 10" Command="{Binding ResetCommand}"/>
+			<TextBlock Margin="0 15 0 5" Text="Алгоритм"/>
+			<ComboBox Height="30" ItemsSource="{Binding Algorithms}" SelectedItem="{Binding SelectedAlgorithm}"/>
 
-			<TextBlock Margin="0 25 0 10" FontWeight="Bold" Text="Добавить гейт"/>
+			<TextBlock Margin="0 15 0 5" Text="Кубитов"/>
+			<TextBox Height="30" Text="{Binding QubitCount}"/>
 
-			<Button Content="H" Margin="0 5" Command="{Binding AddHCommand}"/>
-			<Button Content="X" Margin="0 5" Command="{Binding AddXCommand}"/>
-			<Button Content="S" Margin="0 5" Command="{Binding AddSCommand}"/>
-			<Button Content="T" Margin="0 5" Command="{Binding AddTCommand}"/>
-			<Button Content="SWAP" Margin="0 5" Command="{Binding AddSwapCommand}"/>
+			<TextBlock Margin="0 15 0 5" Text="Target qubit"/>
+			<ComboBox Height="30" ItemsSource="{Binding AvailableQubits}" SelectedItem="{Binding SelectedQubit}"/>
 
-			<TextBlock Margin="0 25 0 10" FontWeight="Bold" Text="Схема"/>
+			<Button Margin="0 15 0 0" Height="35" Content="Выполнить" Command="{Binding ExecuteCommand}"/>
+			<Button Margin="0 10" Height="35" Content="Измерить" Command="{Binding MeasureCommand}"/>
+			<Button Margin="0 10" Height="35" Content="Сброс" Command="{Binding ResetCommand}"/>
 
-			<ListBox Height="250" ItemsSource="{Binding CircuitLines}"/>
+			<TextBlock Margin="0 25 0 10" FontWeight="Bold" Text="Гейты"/>
+
+			<WrapPanel>
+				<Button Width="70" Margin="5" Content="H" Command="{Binding AddHCommand}"/>
+				<Button Width="70" Margin="5" Content="X" Command="{Binding AddXCommand}"/>
+				<Button Width="70" Margin="5" Content="Y" Command="{Binding AddYCommand}"/>
+				<Button Width="70" Margin="5" Content="Z" Command="{Binding AddZCommand}"/>
+
+				<Button Width="70" Margin="5" Content="S" Command="{Binding AddSCommand}"/>
+				<Button Width="70" Margin="5" Content="T" Command="{Binding AddTCommand}"/>
+
+				<Button Width="70" Margin="5" Content="Rx" Command="{Binding AddRxCommand}"/>
+				<Button Width="70" Margin="5" Content="Ry" Command="{Binding AddRyCommand}"/>
+				<Button Width="70" Margin="5" Content="Rz" Command="{Binding AddRzCommand}"/>
+
+				<Button Width="70" Margin="5" Content="SWAP" Command="{Binding AddSwapCommand}"/>
+			</WrapPanel>
+
+			<TextBlock Margin="0 25 0 10" FontWeight="Bold" Text="Квантовая схема"/>
+
+			<ListBox Height="280" ItemsSource="{Binding CircuitLines}"/>
 
 		</StackPanel>
 
@@ -41,11 +58,9 @@
 		          AutoGenerateColumns="False">
 
 			<DataGrid.Columns>
-
 				<DataGridTextColumn Header="Базисное состояние" Binding="{Binding Basis}"/>
 				<DataGridTextColumn Header="Амплитуда" Binding="{Binding Amplitude}"/>
 				<DataGridTextColumn Header="Вероятность (%)" Binding="{Binding Probability}"/>
-
 			</DataGrid.Columns>
 
 		</DataGrid>

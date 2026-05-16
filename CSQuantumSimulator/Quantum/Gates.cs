@@ -67,12 +67,48 @@ public static class Gates
 
 	public static QuantumGate PhaseT(int target)
 	{
-		Complex phase = Complex.FromPolarCoordinates(1, Math.PI / 4);
+		var phase = Complex.FromPolarCoordinates(1, Math.PI / 4);
 
 		return new QuantumGate("T", new ComplexMatrix(new Complex[,]
 		{
 			{1,0},
 			{0,phase}
+		}), target);
+	}
+
+	public static QuantumGate Rx(int target, double angle)
+	{
+		var c = Math.Cos(angle / 2);
+		var s = -Complex.ImaginaryOne * Math.Sin(angle / 2);
+
+		return new QuantumGate("Rx", new ComplexMatrix(new Complex[,]
+		{
+			{c,s},
+			{s,c}
+		}), target);
+	}
+
+	public static QuantumGate Ry(int target, double angle)
+	{
+		var c = Math.Cos(angle / 2);
+		var s = Math.Sin(angle / 2);
+
+		return new QuantumGate("Ry", new ComplexMatrix(new Complex[,]
+		{
+			{c,-s},
+			{s,c}
+		}), target);
+	}
+
+	public static QuantumGate Rz(int target, double angle)
+	{
+		var p1 = Complex.FromPolarCoordinates(1, -angle / 2);
+		var p2 = Complex.FromPolarCoordinates(1, angle / 2);
+
+		return new QuantumGate("Rz", new ComplexMatrix(new Complex[,]
+		{
+			{p1,0},
+			{0,p2}
 		}), target);
 	}
 

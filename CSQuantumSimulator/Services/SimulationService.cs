@@ -10,14 +10,14 @@ namespace CSQuantumSimulator.Services;
 
 public class SimulationService
 {
-	public QuantumRegister Run(
-		QuantumCircuit circuit,
-		int qubits)
+	public QuantumRegister Run(QuantumCircuit circuit, int qubitCount)
 	{
-		var register =
-			new QuantumRegister(qubits);
+		circuit.Validate(qubitCount);
 
-		circuit.Execute(register);
+		var register = new QuantumRegister(qubitCount);
+
+		foreach (var gate in circuit.Gates)
+			register.ApplyGate(gate);
 
 		return register;
 	}
