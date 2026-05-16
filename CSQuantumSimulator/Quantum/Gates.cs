@@ -9,7 +9,7 @@
 //Phase()
 //T()
 //CNOT()
-//SWAP()
+//SWAP() и прочее
 
 using System;
 using System.Numerics;
@@ -115,6 +115,11 @@ public static class Gates
 	public static QuantumGate CNOT(int control, int target)
 	{
 		return new QuantumGate("CNOT", null!, target, control);
+	}
+
+	public static QuantumGate CZ(int control, int target)
+	{
+		return new QuantumGate("CZ", null!, target, control);
 	}
 
 	public static QuantumGate Swap(int first, int second)

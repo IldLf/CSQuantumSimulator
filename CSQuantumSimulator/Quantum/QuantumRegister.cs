@@ -31,11 +31,20 @@ public class QuantumRegister
 			return;
 		}
 
+		if (gate.Name == "CZ")
+		{
+			ApplyCZ(gate.ControlQubit!.Value, gate.TargetQubit);
+			return;
+		}
+
 		if (gate.Name == "SWAP")
 		{
 			ApplySwap(gate.TargetQubit, gate.ControlQubit!.Value);
 			return;
 		}
+
+		if (gate.Matrix is null)
+			throw new InvalidOperationException($"Гейт {gate.Name} не имеет матрицы");
 
 		ApplySingleQubit(gate);
 	}
@@ -43,21 +52,22 @@ public class QuantumRegister
 	private void ApplySingleQubit(QuantumGate gate)
 	{
 		int size = State.Amplitudes.Length;
-		var result = new System.Numerics.Complex[size];
+		var result = (System.Numerics.Complex[])State.Amplitudes.Clone();
 		int bit = 1 << gate.TargetQubit;
 
 		for (int i = 0; i < size; i++)
 		{
-			int zero = i & ~bit;
-			int one = zero | bit;
+			if ((i & bit) != 0)
+				continue;
 
-			result[zero] =
-				gate.Matrix[0, 0] * State.Amplitudes[zero]
-				+ gate.Matrix[0, 1] * State.Amplitudes[one];
+			int zero = i;
+			int one = i | bit;
 
-			result[one] =
-				gate.Matrix[1, 0] * State.Amplitudes[zero]
-				+ gate.Matrix[1, 1] * State.Amplitudes[one];
+			var a = State.Amplitudes[zero];
+			var b = State.Amplitudes[one];
+
+			result[zero] = gate.Matrix[0, 0] * a + gate.Matrix[0, 1] * b;
+			result[one] = gate.Matrix[1, 0] * a + gate.Matrix[1, 1] * b;
 		}
 
 		State.SetAmplitudes(result);
@@ -66,7 +76,6 @@ public class QuantumRegister
 	private void ApplyCNOT(int control, int target)
 	{
 		int size = State.Amplitudes.Length;
-
 		int cMask = 1 << control;
 		int tMask = 1 << target;
 
@@ -74,11 +83,28 @@ public class QuantumRegister
 
 		for (int i = 0; i < size; i++)
 		{
-			if ((i & cMask) != 0)
+			if ((i & cMask) != 0 && (i & tMask) == 0)
 			{
-				int swapped = i ^ tMask;
+				int swapped = i | tMask;
 				(result[i], result[swapped]) = (result[swapped], result[i]);
 			}
+		}
+
+		State.SetAmplitudes(result);
+	}
+
+	private void ApplyCZ(int control, int target)
+	{
+		int size = State.Amplitudes.Length;
+		int cMask = 1 << control;
+		int tMask = 1 << target;
+
+		var result = (System.Numerics.Complex[])State.Amplitudes.Clone();
+
+		for (int i = 0; i < size; i++)
+		{
+			if ((i & cMask) != 0 && (i & tMask) != 0)
+				result[i] *= -1;
 		}
 
 		State.SetAmplitudes(result);
@@ -101,7 +127,9 @@ public class QuantumRegister
 			if ((firstBit == 0 && secondBit != 0) || (firstBit != 0 && secondBit == 0))
 			{
 				int swapped = i ^ firstMask ^ secondMask;
-				(result[i], result[swapped]) = (result[swapped], result[i]);
+
+				if (i < swapped)
+					(result[i], result[swapped]) = (result[swapped], result[i]);
 			}
 		}
 

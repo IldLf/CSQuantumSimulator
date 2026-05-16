@@ -40,6 +40,8 @@ public class MainViewModel : BaseViewModel
 
 	public int SelectedQubit { get; set; }
 
+	public int ControlQubit { get; set; } = 1;
+
 	private string selectedAlgorithm = "Состояние Белла";
 
 	public string SelectedAlgorithm
@@ -68,6 +70,8 @@ public class MainViewModel : BaseViewModel
 	public ICommand AddRzCommand { get; }
 
 	public ICommand AddSwapCommand { get; }
+	public ICommand AddCnotCommand { get; }
+	public ICommand AddCzCommand { get; }
 
 	public MainViewModel()
 	{
@@ -92,13 +96,9 @@ public class MainViewModel : BaseViewModel
 		AddRyCommand = new RelayCommand(() => AddGate(Gates.Ry(SelectedQubit, Math.PI / 2)));
 		AddRzCommand = new RelayCommand(() => AddGate(Gates.Rz(SelectedQubit, Math.PI / 2)));
 
-		AddSwapCommand = new RelayCommand(() =>
-		{
-			if (QubitCount < 2)
-				return;
-
-			AddGate(Gates.Swap(0, 1));
-		});
+		AddCnotCommand = new RelayCommand(() => AddGate(Gates.CNOT(ControlQubit, SelectedQubit)));
+		AddCzCommand = new RelayCommand(() => AddGate(Gates.CZ(ControlQubit, SelectedQubit)));
+		AddSwapCommand = new RelayCommand(() => AddGate(Gates.Swap(SelectedQubit, ControlQubit)));
 	}
 
 	private void AddGate(QuantumGate gate)
@@ -154,7 +154,9 @@ public class MainViewModel : BaseViewModel
 		StateEntries.Clear();
 
 		foreach (var state in visualization.BuildStateEntries(register))
+		{
 			StateEntries.Add(state);
+		}
 	}
 
 	private void RenderCircuit()
