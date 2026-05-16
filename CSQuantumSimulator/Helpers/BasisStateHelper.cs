@@ -2,15 +2,12 @@
 
 //| 0101⟩
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace CSQuantumSimulator.Helpers;
 
-namespace CSQuantumSimulator.Helpers
+public static class BasisStateHelper
 {
-    class BasisStateHelper
-    {
-    }
+	public static string Format(int index, int qubits)
+	{
+		return "|" + Convert.ToString(index, 2).PadLeft(qubits, '0') + "⟩";
+	}
 }

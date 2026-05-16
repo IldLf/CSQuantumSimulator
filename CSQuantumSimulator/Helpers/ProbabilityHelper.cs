@@ -1,14 +1,11 @@
 ﻿// округления
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace CSQuantumSimulator.Helpers;
 
-namespace CSQuantumSimulator.Helpers
+public static class ProbabilityHelper
 {
-    class ProbabilityHelper
-    {
-    }
+	public static double Percent(double probability)
+	{
+		return probability * 100.0;
+	}
 }

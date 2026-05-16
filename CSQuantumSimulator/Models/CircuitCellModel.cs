@@ -1,14 +1,8 @@
 ﻿// ячейка схемы
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace CSQuantumSimulator.Models;
 
-namespace CSQuantumSimulator.Models
+public class CircuitCellModel
 {
-    class CircuitCellModel
-    {
-    }
+	public string Label { get; set; } = "";
 }

@@ -4,15 +4,39 @@
 
 //state → строки таблицы
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CSQuantumSimulator.Helpers;
+using CSQuantumSimulator.Models;
+using CSQuantumSimulator.Quantum;
 
-namespace CSQuantumSimulator.Services
+namespace CSQuantumSimulator.Services;
+
+public class VisualizationService
 {
-    class VisualizationService
-    {
-    }
+	public List<StateEntryModel> BuildStateEntries(
+		QuantumRegister register)
+	{
+		var result = new List<StateEntryModel>();
+
+		var probs = register.State.GetProbabilities();
+
+		for (int i = 0; i < probs.Length; i++)
+		{
+			result.Add(new StateEntryModel
+			{
+				Basis = BasisStateHelper.Format(
+					i,
+					register.QubitCount),
+
+				Amplitude =
+					ComplexFormatter.Format(
+						register.State.Amplitudes[i]),
+
+				Probability =
+					ProbabilityHelper.Percent(
+						probs[i])
+			});
+		}
+
+		return result;
+	}
 }

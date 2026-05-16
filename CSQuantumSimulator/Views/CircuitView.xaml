@@ -1,8 +1,11 @@
- визуализация схемы
+ <!--визуализация схемы
 
 Показывает:
 
 q0 ─ H ─ ●
 q1 ──── X
 
-можно через Grid + Borders.
+можно через Grid + Borders.-->
+
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"/>

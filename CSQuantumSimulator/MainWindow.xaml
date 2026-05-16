@@ -1,12 +1,62 @@
 ﻿<Window x:Class="CSQuantumSimulator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CSQuantumSimulator"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="CSQuantumSimulator"
+        Height="700"
+        Width="1200">
 
-    </Grid>
+	<Grid Margin="20">
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+
+		<StackPanel Orientation="Horizontal">
+
+			<ComboBox Width="220"
+                      ItemsSource="{Binding Algorithms}"
+                      SelectedItem="{Binding SelectedAlgorithm}"/>
+
+			<Button Content="Выполнить"
+                    Width="120"
+                    Margin="10 0"
+                    Command="{Binding ExecuteCommand}"/>
+
+			<Button Content="Сброс"
+                    Width="120"
+                    Command="{Binding ResetCommand}"/>
+
+		</StackPanel>
+
+		<TextBlock Grid.Row="1"
+                   Margin="0 20"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Text="Вектор состояния квантовой системы"/>
+
+		<DataGrid Grid.Row="2"
+                  ItemsSource="{Binding StateEntries}"
+                  AutoGenerateColumns="False">
+
+			<DataGrid.Columns>
+
+				<DataGridTextColumn
+                    Header="Базисное состояние"
+                    Binding="{Binding Basis}"/>
+
+				<DataGridTextColumn
+                    Header="Амплитуда"
+                    Binding="{Binding Amplitude}"/>
+
+				<DataGridTextColumn
+                    Header="Вероятность (%)"
+                    Binding="{Binding Probability}"/>
+
+			</DataGrid.Columns>
+
+		</DataGrid>
+
+	</Grid>
 </Window>

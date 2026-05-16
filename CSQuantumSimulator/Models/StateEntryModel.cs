@@ -2,15 +2,11 @@
 //Amplitude
 //Probability
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace CSQuantumSimulator.Models;
 
-namespace CSQuantumSimulator.Models
+public class StateEntryModel
 {
-    class StateEntryModel
-    {
-    }
+	public string Basis { get; set; } = "";
+	public string Amplitude { get; set; } = "";
+	public double Probability { get; set; }
 }
