@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
+using System.Diagnostics;
 using System.Windows.Input;
 using Microsoft.Win32;
 using CSQuantumSimulator.Algorithms;
@@ -21,18 +21,97 @@ public class MainViewModel : BaseViewModel
 	private QuantumRegister? register;
 	private int currentStep;
 
+	private int qubitCount = 2;
+	private int selectedQubit;
+	private int controlQubit = 1;
+
+	private double executionTime;
+	private double memoryUsage;
+
 	public ObservableCollection<StateEntryModel> StateEntries { get; } = new();
 	public ObservableCollection<string> Algorithms { get; } = new();
-	public ObservableCollection<int> AvailableQubits { get; } = new();
 	public ObservableCollection<CircuitRowModel> CircuitRows { get; } = new();
 
 	public QuantumCircuit CurrentCircuit { get; private set; } = new();
 
-	public int QubitCount { get; set; } = 2;
-	public int SelectedQubit { get; set; }
-	public int ControlQubit { get; set; } = 1;
+	public int QubitCount
+	{
+		get => qubitCount;
+		set
+		{
+			if (value < 1)
+				value = 1;
+
+			if (value > 20)
+				value = 20;
+
+			qubitCount = value;
+
+			if (selectedQubit >= qubitCount)
+				selectedQubit = qubitCount - 1;
+
+			if (controlQubit >= qubitCount)
+				controlQubit = qubitCount - 1;
+
+			SwitchToCustom();
+			Notify();
+			Notify(nameof(SelectedQubit));
+			Notify(nameof(ControlQubit));
+
+			RenderCircuit();
+		}
+	}
+
+	public int SelectedQubit
+	{
+		get => selectedQubit;
+		set
+		{
+			if (value >= 0 && value < QubitCount)
+			{
+				selectedQubit = value;
+				SwitchToCustom();
+				Notify();
+			}
+		}
+	}
+
+	public int ControlQubit
+	{
+		get => controlQubit;
+		set
+		{
+			if (value >= 0 && value < QubitCount)
+			{
+				controlQubit = value;
+				SwitchToCustom();
+				Notify();
+			}
+		}
+	}
+
+	public double ExecutionTime
+	{
+		get => executionTime;
+		set
+		{
+			executionTime = value;
+			Notify();
+		}
+	}
+
+	public double MemoryUsage
+	{
+		get => memoryUsage;
+		set
+		{
+			memoryUsage = value;
+			Notify();
+		}
+	}
 
 	private string selectedAlgorithm = "Произвольный алгоритм";
+
 	public string SelectedAlgorithm
 	{
 		get => selectedAlgorithm;
@@ -71,9 +150,6 @@ public class MainViewModel : BaseViewModel
 
 		foreach (var algorithm in algorithmObjects)
 			Algorithms.Add(algorithm.Name);
-
-		for (int i = 0; i < 8; i++)
-			AvailableQubits.Add(i);
 
 		ExecuteCommand = new RelayCommand(Execute);
 		StepCommand = new RelayCommand(Step);
@@ -115,9 +191,11 @@ public class MainViewModel : BaseViewModel
 		currentStep = 0;
 		register = null;
 
+		ExecutionTime = 0;
+		MemoryUsage = 0;
+
 		RenderCircuit();
 		Render();
-		Notify(nameof(QubitCount));
 	}
 
 	private void Save()
@@ -140,6 +218,7 @@ public class MainViewModel : BaseViewModel
 			currentStep = 0;
 			register = null;
 			RenderCircuit();
+			Render();
 		}
 	}
 
@@ -154,14 +233,30 @@ public class MainViewModel : BaseViewModel
 		if (gate.ControlQubit == gate.TargetQubit)
 			return;
 
+		SwitchToCustom();
 		CurrentCircuit.AddGate(gate);
 		RenderCircuit();
 	}
 
 	private void Execute()
 	{
+		GC.Collect();
+
+		var before = GC.GetTotalMemory(true);
+
+		var watch = Stopwatch.StartNew();
+
 		register = simulation.Run(CurrentCircuit, QubitCount);
+
+		watch.Stop();
+
+		var after = GC.GetTotalMemory(false);
+
+		ExecutionTime = watch.ElapsedMilliseconds;
+		MemoryUsage = (after - before) / 1024d;
+
 		currentStep = CurrentCircuit.Gates.Count;
+
 		RenderCircuit();
 		Render();
 	}
@@ -199,7 +294,9 @@ public class MainViewModel : BaseViewModel
 		StateEntries.Clear();
 
 		foreach (var state in visualization.BuildStateEntries(register))
+		{
 			StateEntries.Add(state);
+		}
 	}
 
 	private void RenderCircuit()
@@ -207,15 +304,27 @@ public class MainViewModel : BaseViewModel
 		CircuitRows.Clear();
 
 		foreach (var row in visualization.BuildCircuit(CurrentCircuit, QubitCount, currentStep))
+		{
 			CircuitRows.Add(row);
+		}
 	}
 
 	private void Reset()
 	{
-		StateEntries.Clear();
-		CircuitRows.Clear();
-		CurrentCircuit.Clear();
 		register = null;
 		currentStep = 0;
+		ExecutionTime = 0;
+		MemoryUsage = 0;
+
+		RenderCircuit();
+		StateEntries.Clear();
+	}
+
+	private void SwitchToCustom()
+	{
+		if (SelectedAlgorithm != "Произвольный алгоритм")
+		{
+			selectedAlgorithm = "Произвольный алгоритм";
+		}
 	}
 }
