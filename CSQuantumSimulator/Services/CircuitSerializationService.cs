@@ -7,39 +7,38 @@ namespace CSQuantumSimulator.Services;
 
 public class CircuitSerializationService
 {
-	private class GateData
+	public class CircuitData
+	{
+		public string SelectedAlgorithm { get; set; } = "";
+		public int QubitCount { get; set; }
+		public int SelectedQubit { get; set; }
+		public int ControlQubit { get; set; }
+		public List<GateData> Gates { get; set; } = new();
+	}
+
+	public class GateData
 	{
 		public string Name { get; set; } = "";
 		public int TargetQubit { get; set; }
 		public int? ControlQubit { get; set; }
 	}
 
-	public void Save(QuantumCircuit circuit, string path)
+	public void Save(CircuitData circuit, string path)
 	{
-		var data = new List<GateData>();
-
-		foreach (var gate in circuit.Gates)
-		{
-			data.Add(new GateData
-			{
-				Name = gate.Name,
-				TargetQubit = gate.TargetQubit,
-				ControlQubit = gate.ControlQubit
-			});
-		}
-
-		File.WriteAllText(path, JsonSerializer.Serialize(data, new JsonSerializerOptions{WriteIndented = true}));
+		File.WriteAllText(path, JsonSerializer.Serialize(circuit, new JsonSerializerOptions { WriteIndented = true }));
 	}
 
-	public QuantumCircuit Load(string path)
+	public CircuitData Load(string path)
 	{
 		var json = File.ReadAllText(path);
+		return JsonSerializer.Deserialize<CircuitData>(json) ?? new();
+	}
 
-		var data = JsonSerializer.Deserialize<List<GateData>>(json) ?? new();
-
+	public QuantumCircuit BuildCircuit(CircuitData data)
+	{
 		var circuit = new QuantumCircuit();
 
-		foreach (var gate in data)
+		foreach (var gate in data.Gates)
 			circuit.AddGate(CreateGate(gate));
 
 		return circuit;
@@ -61,7 +60,7 @@ public class CircuitSerializationService
 			"CNOT" => Gates.CNOT(gate.ControlQubit!.Value, gate.TargetQubit),
 			"CZ" => Gates.CZ(gate.ControlQubit!.Value, gate.TargetQubit),
 			"SWAP" => Gates.Swap(gate.ControlQubit!.Value, gate.TargetQubit),
-			_ => throw new InvalidDataException($"Неизвестный гейт: {gate.Name}")
+			_ => throw new InvalidDataException()
 		};
 	}
 }

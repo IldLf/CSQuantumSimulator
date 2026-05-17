@@ -5,7 +5,7 @@
         Height="950"
         Width="1700">
 
-	<Grid Margin="20">
+	<Grid Margin="10">
 
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="360"/>
@@ -19,19 +19,21 @@
 			<TextBlock Margin="0 5 0 5" Text="Алгоритм"/>
 			<ComboBox Height="30" ItemsSource="{Binding Algorithms}" SelectedItem="{Binding SelectedAlgorithm}"/>
 
-			<TextBlock Margin="0 15 0 5" Text="Количество кубитов"/>
-			<TextBox Height="30" Text="{Binding QubitCount, UpdateSourceTrigger=PropertyChanged}"/>
+			<TextBlock Margin="0 10 0 5" Text="Количество кубитов"/>
+			<TextBox Height="25" Text="{Binding QubitCount, UpdateSourceTrigger=PropertyChanged}"/>
 
-			<TextBlock Margin="0 15 0 5" Text="Целевой кубит"/>
-			<TextBox Height="30" Text="{Binding SelectedQubit, UpdateSourceTrigger=PropertyChanged}"/>
+			<TextBlock Margin="0 10 0 5" Text="Целевой кубит"/>
+			<TextBox Height="25" Text="{Binding SelectedQubit, UpdateSourceTrigger=PropertyChanged}"/>
 
-			<TextBlock Margin="0 15 0 5" Text="Управляющий кубит"/>
-			<TextBox Height="30" Text="{Binding ControlQubit, UpdateSourceTrigger=PropertyChanged}"/>
+			<TextBlock Margin="0 10 0 5" Text="Управляющий кубит"/>
+			<TextBox Height="25" Text="{Binding ControlQubit, UpdateSourceTrigger=PropertyChanged}"/>
 
-			<Button Margin="0 15 0 0" Height="35" Content="Выполнить" Command="{Binding ExecuteCommand}"/>
-			<Button Margin="0 10 0 0" Height="35" Content="Шаг" Command="{Binding StepCommand}"/>
-			<Button Margin="0 10 0 0" Height="35" Content="Измерить" Command="{Binding MeasureCommand}"/>
-			<Button Margin="0 10 0 0" Height="35" Content="Сброс" Command="{Binding ResetCommand}"/>
+			<Button Margin="0 15 0 0" Height="25" Content="Выполнить полностью" Command="{Binding ExecuteCommand}"/>
+			<Button Margin="0 10 0 0" Height="25" Content="Выполнить шаг" Command="{Binding StepCommand}"/>
+			<Button Margin="0 10 0 0" Height="25" Content="Измерить регистр" Command="{Binding MeasureCommand}"/>
+			<Button Margin="0 10 0 0" Height="25" Content="Отменить выполнение" Command="{Binding ResetCommand}"/>
+			<Button Margin="0 10 0 0" Height="25" Content="Отменить гейт" Command="{Binding UndoGateCommand}"/>
+			<Button Margin="0 10 0 0" Height="25" Content="Очистить схему" Command="{Binding ClearCircuitCommand}"/>
 
 			<TextBlock Margin="0 25 0 10" FontWeight="Bold" Text="Гейты"/>
 
@@ -57,7 +59,7 @@
 
 		</StackPanel>
 
-		<Grid Grid.Column="1">
+		<Grid Grid.Column="1" Margin="10 0 0 0">
 
 			<Grid.RowDefinitions>
 				<RowDefinition Height="300"/>
@@ -128,16 +130,24 @@
 				</ScrollViewer>	
 			</GroupBox>
 
-			<GroupBox Grid.Row="1" Header="Производительность" Margin="10">
-				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<TextBlock Margin="20 0"
-				   FontSize="14"
-				   Text="{Binding ExecutionTime, StringFormat=Время: {0:F6} мс}"/>
+			<GroupBox Grid.Row="1" Header="Состояние симуляции" Margin="10">
 
-					<TextBlock Margin="20 0"
-				   FontSize="14"
-				   Text="{Binding MemoryUsage, StringFormat=Память: {0:F6} КБ}"/>
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+					<TextBlock Margin="0" FontSize="14"
+						Text="{Binding GateCount, StringFormat=Количество гейтов: {0}}"/>
+
+					<TextBlock Margin="20 0" FontSize="14"
+					   Text="{Binding CurrentStep, StringFormat=Шагов: {0}}"/>
+
+					<TextBlock Margin="20 0" FontSize="14" 
+						Text="{Binding ExecutionTime, StringFormat=Затраченное время: {0:F6} мс}"/>
+
+					<TextBlock Margin="20 0" FontSize="14"
+				   Text="{Binding MemoryUsage, StringFormat=Использованная память: {0:F6} КБ}"/>
+
 				</StackPanel>
+
 			</GroupBox>
 
 			<DataGrid Grid.Row="2"

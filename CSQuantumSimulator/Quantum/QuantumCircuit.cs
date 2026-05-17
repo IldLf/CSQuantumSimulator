@@ -1,19 +1,4 @@
-﻿//using CSQuantumSimulator.Quantum;
-
-//модель схемы
-
-//Хранит:
-
-//List<QuantumGate>
-
-//Методы:
-
-//AddGate
-//RemoveGate
-//Execute
-//Clear
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace CSQuantumSimulator.Quantum;
@@ -27,6 +12,12 @@ public class QuantumCircuit
 	public void AddGate(QuantumGate gate)
 	{
 		gates.Add(gate);
+	}
+
+	public void RemoveLast()
+	{
+		if (gates.Count > 0)
+			gates.RemoveAt(gates.Count - 1);
 	}
 
 	public void Clear()

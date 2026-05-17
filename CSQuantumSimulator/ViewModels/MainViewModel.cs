@@ -28,6 +28,9 @@ public class MainViewModel : BaseViewModel
 	private double executionTime;
 	private double memoryUsage;
 
+	public int GateCount => CurrentCircuit.Gates.Count;
+	public int CurrentStep => currentStep;
+
 	public ObservableCollection<StateEntryModel> StateEntries { get; } = new();
 	public ObservableCollection<string> Algorithms { get; } = new();
 	public ObservableCollection<CircuitRowModel> CircuitRows { get; } = new();
@@ -143,6 +146,8 @@ public class MainViewModel : BaseViewModel
 	public ICommand AddSwapCommand { get; }
 	public ICommand AddCnotCommand { get; }
 	public ICommand AddCzCommand { get; }
+	public ICommand UndoGateCommand { get; }
+	public ICommand ClearCircuitCommand { get; }
 
 	public MainViewModel()
 	{
@@ -171,6 +176,8 @@ public class MainViewModel : BaseViewModel
 		AddCnotCommand = new RelayCommand(() => AddGate(Gates.CNOT(ControlQubit, SelectedQubit)));
 		AddCzCommand = new RelayCommand(() => AddGate(Gates.CZ(ControlQubit, SelectedQubit)));
 		AddSwapCommand = new RelayCommand(() => AddGate(Gates.Swap(SelectedQubit, ControlQubit)));
+		UndoGateCommand = new RelayCommand(UndoGate);
+		ClearCircuitCommand = new RelayCommand(ClearCircuit);
 
 		LoadAlgorithm();
 	}
@@ -196,6 +203,8 @@ public class MainViewModel : BaseViewModel
 
 		RenderCircuit();
 		Render();
+		Notify(nameof(GateCount));
+		Notify(nameof(CurrentStep));
 	}
 
 	private void Save()
@@ -204,7 +213,19 @@ public class MainViewModel : BaseViewModel
 		dialog.Filter = "JSON|*.json";
 
 		if (dialog.ShowDialog() == true)
-			serialization.Save(CurrentCircuit, dialog.FileName);
+			serialization.Save(new CircuitSerializationService.CircuitData
+			{
+				SelectedAlgorithm = SelectedAlgorithm,
+				QubitCount = QubitCount,
+				SelectedQubit = SelectedQubit,
+				ControlQubit = ControlQubit,
+				Gates = CurrentCircuit.Gates.Select(x => new CircuitSerializationService.GateData
+				{
+					Name = x.Name,
+					TargetQubit = x.TargetQubit,
+					ControlQubit = x.ControlQubit
+				}).ToList()
+			}, dialog.FileName);
 	}
 
 	private void Load()
@@ -214,9 +235,23 @@ public class MainViewModel : BaseViewModel
 
 		if (dialog.ShowDialog() == true)
 		{
-			CurrentCircuit = serialization.Load(dialog.FileName);
+			var data = serialization.Load(dialog.FileName);
+
+			selectedAlgorithm = data.SelectedAlgorithm;
+			qubitCount = data.QubitCount;
+			selectedQubit = data.SelectedQubit;
+			controlQubit = data.ControlQubit;
+
+			CurrentCircuit = serialization.BuildCircuit(data);
+
 			currentStep = 0;
 			register = null;
+
+			Notify(nameof(SelectedAlgorithm));
+			Notify(nameof(QubitCount));
+			Notify(nameof(SelectedQubit));
+			Notify(nameof(ControlQubit));
+
 			RenderCircuit();
 			Render();
 		}
@@ -236,13 +271,14 @@ public class MainViewModel : BaseViewModel
 		SwitchToCustom();
 		CurrentCircuit.AddGate(gate);
 		RenderCircuit();
+		Notify(nameof(GateCount));
 	}
 
 	private void Execute()
 	{
 		GC.Collect();
 
-		var before = GC.GetTotalMemory(true);
+		var memoryBefore = GC.GetTotalMemory(true);
 
 		var watch = Stopwatch.StartNew();
 
@@ -250,12 +286,14 @@ public class MainViewModel : BaseViewModel
 
 		watch.Stop();
 
-		var after = GC.GetTotalMemory(false);
+		var memoryAfter = GC.GetTotalMemory(true);
 
-		ExecutionTime = watch.ElapsedMilliseconds;
-		MemoryUsage = (after - before) / 1024d;
+		ExecutionTime = watch.Elapsed.TotalMilliseconds;
+		MemoryUsage = Math.Abs(memoryAfter - memoryBefore) / 1024.0;
 
 		currentStep = CurrentCircuit.Gates.Count;
+
+		Notify(nameof(CurrentStep));
 
 		RenderCircuit();
 		Render();
@@ -263,16 +301,29 @@ public class MainViewModel : BaseViewModel
 
 	private void Step()
 	{
-		if (register is null)
+		if (register == null)
+		{
 			register = new QuantumRegister(QubitCount);
+			currentStep = 0;
+		}
 
 		if (currentStep >= CurrentCircuit.Gates.Count)
 			return;
 
+		var memoryBefore = GC.GetTotalMemory(true);
+		var watch = Stopwatch.StartNew();
+
 		register.ApplyGate(CurrentCircuit.Gates[currentStep]);
+
+		watch.Stop();
+		var memoryAfter = GC.GetTotalMemory(true);
+
+		ExecutionTime = watch.Elapsed.TotalMilliseconds;
+		MemoryUsage = Math.Abs(memoryAfter - memoryBefore) / 1024.0;
 
 		currentStep++;
 
+		Notify(nameof(CurrentStep));
 		RenderCircuit();
 		Render();
 	}
@@ -317,6 +368,7 @@ public class MainViewModel : BaseViewModel
 		MemoryUsage = 0;
 
 		RenderCircuit();
+		Notify(nameof(CurrentStep));
 		StateEntries.Clear();
 	}
 
@@ -325,6 +377,28 @@ public class MainViewModel : BaseViewModel
 		if (SelectedAlgorithm != "Произвольный алгоритм")
 		{
 			selectedAlgorithm = "Произвольный алгоритм";
+			Notify(nameof(SelectedAlgorithm));
 		}
 	}
+
+	private void UndoGate()
+	{
+		SwitchToCustom();
+		CurrentCircuit.RemoveLast();
+		RenderCircuit();
+		Notify(nameof(GateCount));
+	}
+
+	private void ClearCircuit()
+	{
+		SwitchToCustom();
+		CurrentCircuit.Clear();
+		currentStep = 0;
+		register = null;
+		RenderCircuit();
+		StateEntries.Clear();
+		Notify(nameof(GateCount));
+		Notify(nameof(CurrentStep));
+	}
+
 }
