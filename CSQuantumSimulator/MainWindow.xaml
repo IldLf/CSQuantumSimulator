@@ -30,7 +30,13 @@
 
 			<Button Margin="0 15 0 0" Height="25" Content="Выполнить полностью" Command="{Binding ExecuteCommand}"/>
 			<Button Margin="0 10 0 0" Height="25" Content="Выполнить шаг" Command="{Binding StepCommand}"/>
-			<Button Margin="0 10 0 0" Height="25" Content="Измерить регистр" Command="{Binding MeasureCommand}"/>
+
+			<StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+				<Button Width="100"	Height="25" Content="Измерить" Command="{Binding MeasureCommand}"/>
+				<TextBlock Margin="15 8 5 0" Width="120" Height="25" Text="Количество итераций: "/>
+				<TextBox Width="80" Height="25" Margin="10 0 0 0" VerticalContentAlignment="Center" Text="{Binding MeasurementIterations, UpdateSourceTrigger=PropertyChanged}"/>
+			</StackPanel>
+
 			<Button Margin="0 10 0 0" Height="25" Content="Отменить выполнение" Command="{Binding ResetCommand}"/>
 			<Button Margin="0 10 0 0" Height="25" Content="Отменить гейт" Command="{Binding UndoGateCommand}"/>
 			<Button Margin="0 10 0 0" Height="25" Content="Очистить схему" Command="{Binding ClearCircuitCommand}"/>

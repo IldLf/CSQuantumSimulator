@@ -1,6 +1,4 @@
-﻿//логика измерения
-
-using CSQuantumSimulator.Helpers;
+﻿using CSQuantumSimulator.Helpers;
 using CSQuantumSimulator.Models;
 using CSQuantumSimulator.Quantum;
 
@@ -8,17 +6,36 @@ namespace CSQuantumSimulator.Services;
 
 public class MeasurementService
 {
-	public StateEntryModel Measure(QuantumRegister register)
+	public List<StateEntryModel> MeasureMany(QuantumRegister register, int iterations)
 	{
-		int value = register.Measure();
+		var counts = new Dictionary<int, int>();
 
-		return new StateEntryModel
+		for (int i = 0; i < iterations; i++)
 		{
-			Basis = BasisStateHelper.Format(value, register.QubitCount),
+			int value = register.SampleMeasurement();
 
-			Amplitude = "1.000 + 0.000i",
+			if (!counts.ContainsKey(value))
+				counts[value] = 0;
 
-			Probability = 100
-		};
+			counts[value]++;
+		}
+
+		var result = new List<StateEntryModel>();
+
+		foreach (var pair in counts.OrderBy(x => x.Key))
+		{
+			double probability = (double)pair.Value / iterations * 100.0;
+
+			result.Add(new StateEntryModel
+			{
+				Basis = BasisStateHelper.Format(
+				pair.Key, 
+				register.QubitCount),
+				Amplitude = $"{pair.Value} / {iterations}",
+				Probability = probability
+			});
+		}
+
+		return result;
 	}
 }

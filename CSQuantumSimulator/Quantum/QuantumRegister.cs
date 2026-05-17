@@ -1,14 +1,4 @@
-﻿//главный квантовый регистр
-
-//Методы:
-
-//ApplyGate()
-//Measure()
-//GetProbabilities()
-
-//Использует QuantumState.
-
-using System;
+﻿using System;
 
 namespace CSQuantumSimulator.Quantum;
 
@@ -152,6 +142,23 @@ public class QuantumRegister
 				State.Amplitudes[i] = 1;
 				return i;
 			}
+		}
+
+		return 0;
+	}
+
+	public int SampleMeasurement()
+	{
+		var probs = State.GetProbabilities();
+
+		double rand = Random.Shared.NextDouble();
+		double cumulative = 0;
+
+		for (int i = 0; i < probs.Length; i++)
+		{
+			cumulative += probs[i];
+
+			if (rand <= cumulative) { return i; }
 		}
 
 		return 0;

@@ -27,7 +27,7 @@ public class MainViewModel : BaseViewModel
 
 	private double executionTime;
 	private double memoryUsage;
-
+	private int measurementIterations = 100;
 	public int GateCount => CurrentCircuit.Gates.Count;
 	public int CurrentStep => currentStep;
 
@@ -112,6 +112,18 @@ public class MainViewModel : BaseViewModel
 			Notify();
 		}
 	}
+
+	public int MeasurementIterations
+	{
+		get => measurementIterations;
+		set
+		{
+			if (value < 1) { value = 1; }
+			measurementIterations = value;
+			Notify();
+		}
+	}
+
 
 	private string selectedAlgorithm = "Произвольный алгоритм";
 
@@ -330,11 +342,21 @@ public class MainViewModel : BaseViewModel
 
 	private void Measure()
 	{
-		if (register is null)
-			return;
+		if (register is null) { return; }
 
+		GC.Collect();
+
+		var memoryBefore = GC.GetTotalMemory(true);
+		var watch = Stopwatch.StartNew();
+		var measurements = measurement.MeasureMany(register, MeasurementIterations);
+		watch.Stop();
+		var memoryAfter = GC.GetTotalMemory(true);
+
+		ExecutionTime = watch.Elapsed.TotalMilliseconds;
+		MemoryUsage = Math.Abs(memoryAfter - memoryBefore) / 1024.0;
 		StateEntries.Clear();
-		StateEntries.Add(measurement.Measure(register));
+
+		foreach (var entry in measurements) { StateEntries.Add(entry); }
 	}
 
 	private void Render()
