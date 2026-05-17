@@ -1,9 +1,0 @@
- <!--список готовых алгоритмов
-
-кнопки:
-
-Bell
-Deutsch
-Grover-->
-<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"/>
