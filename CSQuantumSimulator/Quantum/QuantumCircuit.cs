@@ -37,9 +37,6 @@ public class QuantumCircuit
 
 	public void Validate(int qubitCount)
 	{
-		if (qubitCount < 1 || qubitCount > 8)
-			throw new InvalidOperationException("Количество кубитов должно быть от 1 до 8.");
-
 		foreach (var gate in gates)
 		{
 			if (gate.TargetQubit < 0 || gate.TargetQubit >= qubitCount)

@@ -1,18 +1,4 @@
-﻿//главная логика приложения
-
-//Содержит:
-
-//CurrentCircuit
-//CurrentRegister
-//SelectedAlgorithm
-//ExecuteCommand
-//MeasureCommand
-//ResetCommand
-//AddGateCommand
-
-//Это мозг программы.
-
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CSQuantumSimulator.Algorithms;
 using CSQuantumSimulator.Models;
@@ -32,15 +18,13 @@ public class MainViewModel : BaseViewModel
 
 	public ObservableCollection<StateEntryModel> StateEntries { get; } = new();
 	public ObservableCollection<string> Algorithms { get; } = new();
-	public ObservableCollection<string> CircuitLines { get; } = new();
 	public ObservableCollection<int> AvailableQubits { get; } = new();
+	public ObservableCollection<CircuitRowModel> CircuitRows { get; } = new();
 
 	public QuantumCircuit CurrentCircuit { get; private set; } = new();
 
 	public int QubitCount { get; set; } = 2;
-
 	public int SelectedQubit { get; set; }
-
 	public int ControlQubit { get; set; } = 1;
 
 	private string selectedAlgorithm = "Состояние Белла";
@@ -66,11 +50,9 @@ public class MainViewModel : BaseViewModel
 	public ICommand AddZCommand { get; }
 	public ICommand AddSCommand { get; }
 	public ICommand AddTCommand { get; }
-
 	public ICommand AddRxCommand { get; }
 	public ICommand AddRyCommand { get; }
 	public ICommand AddRzCommand { get; }
-
 	public ICommand AddSwapCommand { get; }
 	public ICommand AddCnotCommand { get; }
 	public ICommand AddCzCommand { get; }
@@ -94,11 +76,9 @@ public class MainViewModel : BaseViewModel
 		AddZCommand = new RelayCommand(() => AddGate(Gates.PauliZ(SelectedQubit)));
 		AddSCommand = new RelayCommand(() => AddGate(Gates.PhaseS(SelectedQubit)));
 		AddTCommand = new RelayCommand(() => AddGate(Gates.PhaseT(SelectedQubit)));
-
 		AddRxCommand = new RelayCommand(() => AddGate(Gates.Rx(SelectedQubit, Math.PI / 2)));
 		AddRyCommand = new RelayCommand(() => AddGate(Gates.Ry(SelectedQubit, Math.PI / 2)));
 		AddRzCommand = new RelayCommand(() => AddGate(Gates.Rz(SelectedQubit, Math.PI / 2)));
-
 		AddCnotCommand = new RelayCommand(() => AddGate(Gates.CNOT(ControlQubit, SelectedQubit)));
 		AddCzCommand = new RelayCommand(() => AddGate(Gates.CZ(ControlQubit, SelectedQubit)));
 		AddSwapCommand = new RelayCommand(() => AddGate(Gates.Swap(SelectedQubit, ControlQubit)));
@@ -112,57 +92,25 @@ public class MainViewModel : BaseViewModel
 
 	private void Execute()
 	{
-		try
-		{
-			QubitCount = Math.Clamp(QubitCount, 1, 8);
-
-			if (CurrentCircuit.Gates.Count == 0)
-			{
-				var algorithm = AlgorithmLibrary.GetAll().First(x => x.Name == SelectedAlgorithm);
-				CurrentCircuit = algorithm.BuildCircuit();
-			}
-
-			register = simulation.Run(CurrentCircuit, QubitCount);
-
-			currentStep = CurrentCircuit.Gates.Count;
-
-			RenderCircuit();
-			Render();
-		}
-		catch (Exception exception)
-		{
-			ShowError(exception.Message);
-		}
+		register = simulation.Run(CurrentCircuit, QubitCount);
+		currentStep = CurrentCircuit.Gates.Count;
+		RenderCircuit();
+		Render();
 	}
 
 	private void Step()
 	{
-		try
-		{
-			QubitCount = Math.Clamp(QubitCount, 1, 8);
+		if (register is null)
+			register = new QuantumRegister(QubitCount);
 
-			if (CurrentCircuit.Gates.Count == 0)
-			{
-				var algorithm = AlgorithmLibrary.GetAll().First(x => x.Name == SelectedAlgorithm);
-				CurrentCircuit = algorithm.BuildCircuit();
-			}
+		if (currentStep >= CurrentCircuit.Gates.Count)
+			return;
 
-			if (register is null)
-				register = new QuantumRegister(QubitCount);
+		register.ApplyGate(CurrentCircuit.Gates[currentStep]);
+		currentStep++;
 
-			if (currentStep >= CurrentCircuit.Gates.Count)
-				return;
-
-			register.ApplyGate(CurrentCircuit.Gates[currentStep]);
-			currentStep++;
-
-			RenderCircuit();
-			Render();
-		}
-		catch (Exception exception)
-		{
-			ShowError(exception.Message);
-		}
+		RenderCircuit();
+		Render();
 	}
 
 	private void Measure()
@@ -182,45 +130,23 @@ public class MainViewModel : BaseViewModel
 		StateEntries.Clear();
 
 		foreach (var state in visualization.BuildStateEntries(register))
-		{
 			StateEntries.Add(state);
-		}
 	}
 
 	private void RenderCircuit()
 	{
-		CircuitLines.Clear();
+		CircuitRows.Clear();
 
-		for (int i = 0; i < CurrentCircuit.Gates.Count; i++)
-		{
-			var gate = CurrentCircuit.Gates[i];
-			var prefix = i == currentStep ? "► " : "";
-
-			if (gate.ControlQubit.HasValue)
-				CircuitLines.Add($"{prefix}{gate.Name} q{gate.ControlQubit}, q{gate.TargetQubit}");
-			else
-				CircuitLines.Add($"{prefix}{gate.Name} q{gate.TargetQubit}");
-		}
+		foreach (var row in visualization.BuildCircuit(CurrentCircuit, QubitCount, currentStep))
+			CircuitRows.Add(row);
 	}
 
 	private void Reset()
 	{
 		StateEntries.Clear();
-		CircuitLines.Clear();
+		CircuitRows.Clear();
 		CurrentCircuit.Clear();
 		register = null;
 		currentStep = 0;
-	}
-
-	private void ShowError(string message)
-	{
-		StateEntries.Clear();
-
-		StateEntries.Add(new StateEntryModel
-		{
-			Basis = "Ошибка",
-			Amplitude = message,
-			Probability = -1
-		});
 	}
 }

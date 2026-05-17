@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="CSQuantumSimulator"
         Height="900"
-        Width="1650">
+        Width="1700">
 
 	<Grid Margin="20">
 
@@ -14,7 +14,7 @@
 
 		<StackPanel>
 
-			<TextBlock FontSize="20" FontWeight="Bold" Text="CSQuantumSimulator"/>
+			<TextBlock FontSize="22" FontWeight="Bold" Text="CSQuantumSimulator"/>
 
 			<TextBlock Margin="0 15 0 5" Text="Алгоритм"/>
 			<ComboBox Height="30" ItemsSource="{Binding Algorithms}" SelectedItem="{Binding SelectedAlgorithm}"/>
@@ -36,22 +36,18 @@
 			<TextBlock Margin="0 25 0 10" FontWeight="Bold" Text="Гейты"/>
 
 			<WrapPanel>
-
 				<Button Width="70" Margin="5" Content="H" Command="{Binding AddHCommand}"/>
 				<Button Width="70" Margin="5" Content="X" Command="{Binding AddXCommand}"/>
 				<Button Width="70" Margin="5" Content="Y" Command="{Binding AddYCommand}"/>
 				<Button Width="70" Margin="5" Content="Z" Command="{Binding AddZCommand}"/>
 				<Button Width="70" Margin="5" Content="S" Command="{Binding AddSCommand}"/>
 				<Button Width="70" Margin="5" Content="T" Command="{Binding AddTCommand}"/>
-
 				<Button Width="70" Margin="5" Content="Rx" Command="{Binding AddRxCommand}"/>
 				<Button Width="70" Margin="5" Content="Ry" Command="{Binding AddRyCommand}"/>
 				<Button Width="70" Margin="5" Content="Rz" Command="{Binding AddRzCommand}"/>
-
 				<Button Width="70" Margin="5" Content="CNOT" Command="{Binding AddCnotCommand}"/>
 				<Button Width="70" Margin="5" Content="CZ" Command="{Binding AddCzCommand}"/>
 				<Button Width="70" Margin="5" Content="SWAP" Command="{Binding AddSwapCommand}"/>
-
 			</WrapPanel>
 
 		</StackPanel>
@@ -59,23 +55,105 @@
 		<Grid Grid.Column="1">
 
 			<Grid.RowDefinitions>
-				<RowDefinition Height="220"/>
+				<RowDefinition Height="300"/>
 				<RowDefinition Height="*"/>
 			</Grid.RowDefinitions>
 
 			<GroupBox Header="Квантовая схема" Margin="10">
-				<ListBox ItemsSource="{Binding CircuitLines}"/>
+
+				<ItemsControl ItemsSource="{Binding CircuitRows}">
+
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+
+							<StackPanel Orientation="Horizontal">
+
+								<TextBlock Width="40"
+								           VerticalAlignment="Center"
+								           FontWeight="Bold"
+								           Text="{Binding Qubit}"/>
+
+								<ItemsControl ItemsSource="{Binding Cells}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel Orientation="Horizontal"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+
+											<Border Width="60"
+											        Height="45"
+											        Margin="2"
+											        BorderThickness="1"
+											        BorderBrush="Gray">
+
+												<Border.Style>
+													<Style TargetType="Border">
+														<Setter Property="Background" Value="White"/>
+														<Style.Triggers>
+															<DataTrigger Binding="{Binding IsActive}" Value="True">
+																<Setter Property="Background" Value="LightBlue"/>
+															</DataTrigger>
+														</Style.Triggers>
+													</Style>
+												</Border.Style>
+
+												<TextBlock HorizontalAlignment="Center"
+												           VerticalAlignment="Center"
+												           FontWeight="Bold"
+												           Text="{Binding Label}"/>
+
+											</Border>
+
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+
+								</ItemsControl>
+
+							</StackPanel>
+
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+
+				</ItemsControl>
+
 			</GroupBox>
 
 			<DataGrid Grid.Row="1"
-			          Margin="10"
-			          ItemsSource="{Binding StateEntries}"
-			          AutoGenerateColumns="False">
+				  Margin="10"
+				  ItemsSource="{Binding StateEntries}"
+				  AutoGenerateColumns="False"
+				  HorizontalScrollBarVisibility="Disabled"
+				  CanUserAddRows="False"
+				  HeadersVisibility="Column">
 
 				<DataGrid.Columns>
-					<DataGridTextColumn Header="Базисное состояние" Binding="{Binding Basis}"/>
+
+					<DataGridTextColumn Header="Базис" Binding="{Binding Basis}"/>
 					<DataGridTextColumn Header="Амплитуда" Binding="{Binding Amplitude}"/>
 					<DataGridTextColumn Header="Вероятность (%)" Binding="{Binding Probability}"/>
+
+					<DataGridTemplateColumn Header="Диаграмма" Width="450">
+						<DataGridTemplateColumn.CellTemplate>
+							<DataTemplate>
+								<Grid Width="420" Height="22">
+									<Border Background="#ECECEC" CornerRadius="3"/>
+									<Border HorizontalAlignment="Left"
+										Width="{Binding BarWidth}"
+										Background="#4A90E2"
+										CornerRadius="3"/>
+									<TextBlock HorizontalAlignment="Center"
+										   VerticalAlignment="Center"
+										   FontSize="11"
+										   FontWeight="SemiBold"
+										   Text="{Binding Probability, StringFormat={}{0:F2}%}"/>
+								</Grid>
+							</DataTemplate>
+						</DataGridTemplateColumn.CellTemplate>
+					</DataGridTemplateColumn>
+
 				</DataGrid.Columns>
 
 			</DataGrid>
