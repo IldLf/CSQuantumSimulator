@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
+using Microsoft.Win32;
 using CSQuantumSimulator.Algorithms;
 using CSQuantumSimulator.Models;
 using CSQuantumSimulator.Quantum;
@@ -12,6 +14,9 @@ public class MainViewModel : BaseViewModel
 	private readonly SimulationService simulation = new();
 	private readonly VisualizationService visualization = new();
 	private readonly MeasurementService measurement = new();
+	private readonly CircuitSerializationService serialization = new();
+
+	private readonly List<IQuantumAlgorithm> algorithmObjects;
 
 	private QuantumRegister? register;
 	private int currentStep;
@@ -27,14 +32,14 @@ public class MainViewModel : BaseViewModel
 	public int SelectedQubit { get; set; }
 	public int ControlQubit { get; set; } = 1;
 
-	private string selectedAlgorithm = "Состояние Белла";
-
+	private string selectedAlgorithm = "Произвольный алгоритм";
 	public string SelectedAlgorithm
 	{
 		get => selectedAlgorithm;
 		set
 		{
 			selectedAlgorithm = value;
+			LoadAlgorithm();
 			Notify();
 		}
 	}
@@ -43,6 +48,9 @@ public class MainViewModel : BaseViewModel
 	public ICommand StepCommand { get; }
 	public ICommand ResetCommand { get; }
 	public ICommand MeasureCommand { get; }
+
+	public ICommand SaveCommand { get; }
+	public ICommand LoadCommand { get; }
 
 	public ICommand AddHCommand { get; }
 	public ICommand AddXCommand { get; }
@@ -59,7 +67,9 @@ public class MainViewModel : BaseViewModel
 
 	public MainViewModel()
 	{
-		foreach (var algorithm in AlgorithmLibrary.GetAll())
+		algorithmObjects = AlgorithmLibrary.GetAll();
+
+		foreach (var algorithm in algorithmObjects)
 			Algorithms.Add(algorithm.Name);
 
 		for (int i = 0; i < 8; i++)
@@ -69,6 +79,9 @@ public class MainViewModel : BaseViewModel
 		StepCommand = new RelayCommand(Step);
 		ResetCommand = new RelayCommand(Reset);
 		MeasureCommand = new RelayCommand(Measure);
+
+		SaveCommand = new RelayCommand(Save);
+		LoadCommand = new RelayCommand(Load);
 
 		AddHCommand = new RelayCommand(() => AddGate(Gates.Hadamard(SelectedQubit)));
 		AddXCommand = new RelayCommand(() => AddGate(Gates.PauliX(SelectedQubit)));
@@ -82,10 +95,65 @@ public class MainViewModel : BaseViewModel
 		AddCnotCommand = new RelayCommand(() => AddGate(Gates.CNOT(ControlQubit, SelectedQubit)));
 		AddCzCommand = new RelayCommand(() => AddGate(Gates.CZ(ControlQubit, SelectedQubit)));
 		AddSwapCommand = new RelayCommand(() => AddGate(Gates.Swap(SelectedQubit, ControlQubit)));
+
+		LoadAlgorithm();
+	}
+
+	private void LoadAlgorithm()
+	{
+		var algorithm = algorithmObjects.First(x => x.Name == SelectedAlgorithm);
+
+		CurrentCircuit = algorithm.BuildCircuit();
+
+		QubitCount = SelectedAlgorithm switch
+		{
+			"Квантовая телепортация" => 3,
+			"Алгоритм Бернштейна–Вазирани" => 3,
+			_ => 2
+		};
+
+		currentStep = 0;
+		register = null;
+
+		RenderCircuit();
+		Render();
+		Notify(nameof(QubitCount));
+	}
+
+	private void Save()
+	{
+		var dialog = new SaveFileDialog();
+		dialog.Filter = "JSON|*.json";
+
+		if (dialog.ShowDialog() == true)
+			serialization.Save(CurrentCircuit, dialog.FileName);
+	}
+
+	private void Load()
+	{
+		var dialog = new OpenFileDialog();
+		dialog.Filter = "JSON|*.json";
+
+		if (dialog.ShowDialog() == true)
+		{
+			CurrentCircuit = serialization.Load(dialog.FileName);
+			currentStep = 0;
+			register = null;
+			RenderCircuit();
+		}
 	}
 
 	private void AddGate(QuantumGate gate)
 	{
+		if (gate.TargetQubit >= QubitCount)
+			return;
+
+		if (gate.ControlQubit.HasValue && gate.ControlQubit.Value >= QubitCount)
+			return;
+
+		if (gate.ControlQubit == gate.TargetQubit)
+			return;
+
 		CurrentCircuit.AddGate(gate);
 		RenderCircuit();
 	}
@@ -107,6 +175,7 @@ public class MainViewModel : BaseViewModel
 			return;
 
 		register.ApplyGate(CurrentCircuit.Gates[currentStep]);
+
 		currentStep++;
 
 		RenderCircuit();

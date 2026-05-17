@@ -16,7 +16,7 @@
 
 			<TextBlock FontSize="22" FontWeight="Bold" Text="CSQuantumSimulator"/>
 
-			<TextBlock Margin="0 15 0 5" Text="Алгоритм"/>
+			<TextBlock Margin="0 5 0 5" Text="Алгоритм"/>
 			<ComboBox Height="30" ItemsSource="{Binding Algorithms}" SelectedItem="{Binding SelectedAlgorithm}"/>
 
 			<TextBlock Margin="0 15 0 5" Text="Количество кубитов"/>
@@ -50,6 +50,11 @@
 				<Button Width="70" Margin="5" Content="SWAP" Command="{Binding AddSwapCommand}"/>
 			</WrapPanel>
 
+			<StackPanel Orientation="Horizontal" Margin="0 30 0 0">
+				<Button Width="120" Height="30" Margin="20 0 40 0" Content="Сохранить" Command="{Binding SaveCommand}"/>
+				<Button Width="120" Height="30" Content="Загрузить" Command="{Binding LoadCommand}"/>
+			</StackPanel>
+
 		</StackPanel>
 
 		<Grid Grid.Column="1">
@@ -61,64 +66,65 @@
 
 			<GroupBox Header="Квантовая схема" Margin="10">
 
-				<ItemsControl ItemsSource="{Binding CircuitRows}">
+				<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Height="250">
+					<ItemsControl ItemsSource="{Binding CircuitRows}">
 
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
 
-							<StackPanel Orientation="Horizontal">
+								<StackPanel Orientation="Horizontal">
 
-								<TextBlock Width="40"
-								           VerticalAlignment="Center"
-								           FontWeight="Bold"
-								           Text="{Binding Qubit}"/>
+									<TextBlock Width="40"
+											   VerticalAlignment="Center"
+											   FontWeight="Bold"
+											   Text="{Binding Qubit}"/>
 
-								<ItemsControl ItemsSource="{Binding Cells}">
-									<ItemsControl.ItemsPanel>
-										<ItemsPanelTemplate>
-											<StackPanel Orientation="Horizontal"/>
-										</ItemsPanelTemplate>
-									</ItemsControl.ItemsPanel>
+									<ItemsControl ItemsSource="{Binding Cells}">
+										<ItemsControl.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Horizontal"/>
+											</ItemsPanelTemplate>
+										</ItemsControl.ItemsPanel>
 
-									<ItemsControl.ItemTemplate>
-										<DataTemplate>
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
 
-											<Border Width="60"
-											        Height="45"
-											        Margin="2"
-											        BorderThickness="1"
-											        BorderBrush="Gray">
+												<Border Width="60"
+														Height="45"
+														Margin="2"
+														BorderThickness="1"
+														BorderBrush="Gray">
 
-												<Border.Style>
-													<Style TargetType="Border">
-														<Setter Property="Background" Value="White"/>
-														<Style.Triggers>
-															<DataTrigger Binding="{Binding IsActive}" Value="True">
-																<Setter Property="Background" Value="LightBlue"/>
-															</DataTrigger>
-														</Style.Triggers>
-													</Style>
-												</Border.Style>
+													<Border.Style>
+														<Style TargetType="Border">
+															<Setter Property="Background" Value="White"/>
+															<Style.Triggers>
+																<DataTrigger Binding="{Binding IsActive}" Value="True">
+																	<Setter Property="Background" Value="LightBlue"/>
+																</DataTrigger>
+															</Style.Triggers>
+														</Style>
+													</Border.Style>
 
-												<TextBlock HorizontalAlignment="Center"
-												           VerticalAlignment="Center"
-												           FontWeight="Bold"
-												           Text="{Binding Label}"/>
+													<TextBlock HorizontalAlignment="Center"
+															   VerticalAlignment="Center"
+															   FontWeight="Bold"
+															   Text="{Binding Label}"/>
 
-											</Border>
+												</Border>
 
-										</DataTemplate>
-									</ItemsControl.ItemTemplate>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
 
-								</ItemsControl>
+									</ItemsControl>
 
-							</StackPanel>
+								</StackPanel>
 
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
 
-				</ItemsControl>
-
+					</ItemsControl>
+				</ScrollViewer>	
 			</GroupBox>
 
 			<DataGrid Grid.Row="1"

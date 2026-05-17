@@ -12,9 +12,13 @@ public static class AlgorithmLibrary
 	{
 		return new()
 		{
+			new EmptyAlgorithm(),
 			new BellStateAlgorithm(),
 			new DeutschAlgorithm(),
-			new GroverAlgorithm()
+			new GroverAlgorithm(),
+			new QuantumTeleportationAlgorithm(),
+			new SuperdenseCodingAlgorithm(),
+			new BernsteinVaziraniAlgorithm()
 		};
 	}
 }
