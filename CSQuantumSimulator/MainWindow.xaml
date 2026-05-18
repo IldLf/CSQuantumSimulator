@@ -141,15 +141,15 @@
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
 					<TextBlock Margin="0" FontSize="14"
-						Text="{Binding GateCount, StringFormat=Количество гейтов: {0}}"/>
+						Text="{Binding GateCount, StringFormat=Гейтов: {0}}"/>
 
-					<TextBlock Margin="20 0" FontSize="14"
+					<TextBlock Margin="10 0" FontSize="14"
 					   Text="{Binding CurrentStep, StringFormat=Шагов: {0}}"/>
 
-					<TextBlock Margin="20 0" FontSize="14" 
-						Text="{Binding ExecutionTime, StringFormat=Затраченное время: {0:F6} мс}"/>
+					<TextBlock Margin="10 0" FontSize="14" 
+						Text="{Binding ExecutionTime, StringFormat=Время выполнения (без рендера таблицы): {0:F6} мс}"/>
 
-					<TextBlock Margin="20 0" FontSize="14"
+					<TextBlock Margin="10 0" FontSize="14"
 				   Text="{Binding MemoryUsage, StringFormat=Использованная память: {0:F6} КБ}"/>
 
 				</StackPanel>

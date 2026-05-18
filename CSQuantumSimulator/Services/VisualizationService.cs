@@ -1,10 +1,4 @@
-﻿//преобразует данные для UI
-
-//например:
-
-//state → строки таблицы
-
-using System.Collections.ObjectModel;
+﻿	using System.Collections.ObjectModel;
 using CSQuantumSimulator.Helpers;
 using CSQuantumSimulator.Models;
 using CSQuantumSimulator.Quantum;
@@ -20,6 +14,7 @@ public class VisualizationService
 
 		for (int i = 0; i < probabilities.Length; i++)
 		{
+
 			result.Add(new StateEntryModel
 			{
 				Basis = BasisStateHelper.Format(i, register.QubitCount),

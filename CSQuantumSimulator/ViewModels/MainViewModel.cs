@@ -27,7 +27,7 @@ public class MainViewModel : BaseViewModel
 
 	private double executionTime;
 	private double memoryUsage;
-	private int measurementIterations = 100;
+	private int measurementIterations = 1000;
 	public int GateCount => CurrentCircuit.Gates.Count;
 	public int CurrentStep => currentStep;
 
@@ -45,8 +45,8 @@ public class MainViewModel : BaseViewModel
 			if (value < 1)
 				value = 1;
 
-			if (value > 32)
-				value = 32;
+			if (value > 24) // можно максимум 30, но слишком долгая отрисовка таблицы
+				value = 24;
 
 			qubitCount = value;
 

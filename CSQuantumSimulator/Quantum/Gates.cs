@@ -1,17 +1,4 @@
-﻿//factory стандартных гейтов
-
-//Методы:
-
-//Hadamard()
-//PauliX()
-//PauliY()
-//PauliZ()
-//Phase()
-//T()
-//CNOT()
-//SWAP() и прочее
-
-using System;
+﻿using System;
 using System.Numerics;
 
 namespace CSQuantumSimulator.Quantum;
