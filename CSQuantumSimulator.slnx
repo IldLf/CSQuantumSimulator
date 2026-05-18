@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="CSQuantumSimulator.Tests/CSQuantumSimulator.Tests.csproj" Id="b3054797-f3e9-4492-8cf0-37df9d1f396a" />
   <Project Path="CSQuantumSimulator/CSQuantumSimulator.csproj" />
 </Solution>

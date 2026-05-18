@@ -1,6 +1,4 @@
-﻿// 2 - qubit Grover
-
-using CSQuantumSimulator.Quantum;
+﻿using CSQuantumSimulator.Quantum;
 
 namespace CSQuantumSimulator.Algorithms;
 
@@ -15,10 +13,7 @@ public class GroverAlgorithm : IQuantumAlgorithm
 		circuit.AddGate(Gates.Hadamard(0));
 		circuit.AddGate(Gates.Hadamard(1));
 
-		circuit.AddGate(Gates.PauliZ(1));
-		circuit.AddGate(Gates.CNOT(0, 1));
-		circuit.AddGate(Gates.PauliZ(1));
-		circuit.AddGate(Gates.CNOT(0, 1));
+		circuit.AddGate(Gates.CZ(0, 1));
 
 		circuit.AddGate(Gates.Hadamard(0));
 		circuit.AddGate(Gates.Hadamard(1));
@@ -26,7 +21,9 @@ public class GroverAlgorithm : IQuantumAlgorithm
 		circuit.AddGate(Gates.PauliX(0));
 		circuit.AddGate(Gates.PauliX(1));
 
+		circuit.AddGate(Gates.Hadamard(1));
 		circuit.AddGate(Gates.CNOT(0, 1));
+		circuit.AddGate(Gates.Hadamard(1));
 
 		circuit.AddGate(Gates.PauliX(0));
 		circuit.AddGate(Gates.PauliX(1));
