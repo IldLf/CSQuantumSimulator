@@ -38,10 +38,10 @@
 			</StackPanel>
 
 			<Button Margin="0 10 0 0" Height="25" Content="Отменить выполнение" Command="{Binding ResetCommand}"/>
-			<Button Margin="0 10 0 0" Height="25" Content="Отменить гейт" Command="{Binding UndoGateCommand}"/>
+			<Button Margin="0 10 0 0" Height="25" Content="Отменить вентиль" Command="{Binding UndoGateCommand}"/>
 			<Button Margin="0 10 0 0" Height="25" Content="Очистить схему" Command="{Binding ClearCircuitCommand}"/>
 
-			<TextBlock Margin="0 25 0 10" FontWeight="Bold" Text="Гейты"/>
+			<TextBlock Margin="0 25 0 10" FontWeight="Bold" Text="Вентили"/>
 
 			<WrapPanel>
 				<Button Width="70" Margin="5" Content="H" Command="{Binding AddHCommand}"/>
@@ -141,7 +141,7 @@
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
 					<TextBlock Margin="0" FontSize="14"
-						Text="{Binding GateCount, StringFormat=Гейтов: {0}}"/>
+						Text="{Binding GateCount, StringFormat=Вентилей: {0}}"/>
 
 					<TextBlock Margin="10 0" FontSize="14"
 					   Text="{Binding CurrentStep, StringFormat=Шагов: {0}}"/>
