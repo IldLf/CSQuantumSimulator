@@ -45,8 +45,8 @@ public class MainViewModel : BaseViewModel
 			if (value < 1)
 				value = 1;
 
-			if (value > 24) // можно максимум 30, но слишком долгая отрисовка таблицы. При значениях выше 30 может быть переполнение памяти 
-				value = 24;
+			if (value > 30) // При значениях выше 30 может быть переполнение памяти 
+				value = 30;
 
 			qubitCount = value;
 
